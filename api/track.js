@@ -1,13 +1,20 @@
-// api/index.js
+// api/track.js
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const ALLOWED_HOSTS = ['cv-sable-seven.vercel.app'];
 
 export default async function handler(req, res) {
-  // CORS заголовки
-  res.setHeader('Access-Control-Allow-Origin', 'https://cv-sable-seven.vercel.app');
+  // Динамічний CORS
+  const origin = req.headers.origin;
+  if (origin && origin.includes('cv-sable-seven.vercel.app')) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+  
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
   
   if (req.method === 'OPTIONS') {
     return res.status(200).json({ message: 'OK' });

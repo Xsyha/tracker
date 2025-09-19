@@ -1,22 +1,22 @@
-const express = require("express");
-const cors = require("cors");
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
-const app = express();
-const ALLOWED_HOSTS = ['https://cv-sable-seven.vercel.app'];
+const ALLOWED_HOSTS = ['cv-sable-seven.vercel.app'];
 
-app.use(cors({
-  origin:  ['https://cv-sable-seven.vercel.app'],
-  methods: 'GET,POST,PUT,DELETE,PATCH',
-  allowedHeaders: "Content-Type,Authorization"
-}));
-app.use(express.json());
+module.exports = async (req, res) => {
+  // CORS
+  res.setHeader('Access-Control-Allow-Origin', 'https://cv-sable-seven.vercel.app');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
 
-// обробка preflight
-app.options("*", cors());
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
-app.post("/api/track", async (req, res) => {
-  const { to, label } = req.body; // POST тепер використовує body
+  if (req.method !== 'POST') {
+    return res.status(405).send('Method Not Allowed');
+  }
+
+  const { to, label } = req.body;
   if (!to) return res.status(400).send('Missing "to" parameter');
 
   try {
@@ -27,7 +27,7 @@ app.post("/api/track", async (req, res) => {
     return res.status(400).send('Invalid "to" URL');
   }
 
-  const xff = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '';
+  const xff = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '';
   const ip = Array.isArray(xff) ? xff[0] : String(xff).split(',')[0].trim();
 
   let city = 'Unknown';
@@ -58,6 +58,4 @@ app.post("/api/track", async (req, res) => {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.writeHead(302, { Location: to });
   res.end();
-});
-
-app.listen(3000, () => console.log("Server running on http://localhost:3000"));
+};

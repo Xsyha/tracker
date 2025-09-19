@@ -1,17 +1,19 @@
 require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const app = express();
-app.use(cors());
+const ALLOWED_HOSTS = ['cv-sable-seven.vercel.app'];
 
-const ALLOWED_HOSTS = ['https://cv-sable-seven.vercel.app/','https://cv-sable-seven.vercel.app']
+app.use(cors({
+  origin: ALLOWED_HOSTS
+}));
 
 app.get("/api/track", async (req, res) => {
   const { to, label } = req.query;
   if (!to) return res.status(400).send('Missing "to" parameter');
 
-  // перевірка хоста
   try {
     const url = new URL(to);
     const host = url.hostname.replace(/^www\./,'').toLowerCase();
@@ -20,11 +22,9 @@ app.get("/api/track", async (req, res) => {
     return res.status(400).send('Invalid "to" URL');
   }
 
-  // IP користувача
   const xff = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '';
   const ip = Array.isArray(xff) ? xff[0] : String(xff).split(',')[0].trim();
 
-  // геолокація (ip-api.com)
   let city = 'Unknown';
   try {
     const geoRes = await fetch(`http://ip-api.com/json/${ip}?fields=status,city,regionName,country`);
@@ -36,7 +36,6 @@ app.get("/api/track", async (req, res) => {
 
   const text = `${city} - ${label || to}`;
 
-  // Telegram
   const BOT = process.env.BOT_TOKEN;
   const CHAT = process.env.CHAT_ID;
   if (BOT && CHAT) {
@@ -49,17 +48,13 @@ app.get("/api/track", async (req, res) => {
     } catch (err) {
       console.error("Telegram error:", err);
     }
-  } else {
-    console.warn("BOT_TOKEN or CHAT_ID not set!");
   }
 
-  // редірект
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.writeHead(302, { Location: to });
   res.end();
 });
 
-// тестова сторінка
 app.get("/", (req, res) => res.send("CV Tracker Server is running."));
 
 app.listen(3000, () => console.log("Server running on http://localhost:3000"));

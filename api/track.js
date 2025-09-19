@@ -2,7 +2,7 @@
 export default async function handler(req, res) {
   // CORS — дозволити ваш фронт (замість '*' вкажіть домен)
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS, POST, PUT');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(204).end();
@@ -32,7 +32,7 @@ export default async function handler(req, res) {
     if (geo && geo.status === 'success') city = geo.city || geo.regionName || geo.country || 'Unknown';
   } catch (e) { /* ignore */ }
 
-  const text = `${city} - ${label || to}`;
+  const text = `${geo.country} ${city} - ${label || to}`;
 
   // send to Telegram
   try {

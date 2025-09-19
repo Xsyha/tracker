@@ -4,28 +4,40 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 const ALLOWED_HOSTS = ['cv-sable-seven.vercel.app'];
 
 export default async function handler(req, res) {
-  // Динамічний CORS
-  const origin = req.headers.origin;
-  if (origin && origin.includes('cv-sable-seven.vercel.app')) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-  }
+  // Логування для діагностики
+  console.log('Method:', req.method);
+  console.log('Origin:', req.headers.origin);
+  console.log('Headers:', req.headers);
+
+  // Встановлюємо CORS заголовки для ВСІХ відповідей
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+  res.setHeader('Access-Control-Max-Age', '86400');
   
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  
+  // Обробка OPTIONS запиту (preflight)
   if (req.method === 'OPTIONS') {
-    return res.status(200).json({ message: 'OK' });
+    console.log('Handling OPTIONS request');
+    return res.status(200).json({ 
+      message: 'CORS preflight OK',
+      allowedOrigin: '*',
+      allowedMethods: 'GET, POST, OPTIONS'
+    });
   }
   
   if (req.method === 'GET') {
-    return res.json({ status: 'API working', method: 'GET' });
+    return res.status(200).json({ 
+      status: 'Track API working', 
+      method: 'GET',
+      cors: 'enabled'
+    });
   }
   
   if (req.method === 'POST') {
     try {
+      console.log('Handling POST request');
+      console.log('Body:', req.body);
+      
       const { to, label } = req.body;
       
       if (!to) {
@@ -81,6 +93,7 @@ export default async function handler(req, res) {
               disable_web_page_preview: true 
             })
           });
+          console.log('Telegram message sent');
         } catch (err) {
           console.error("Telegram error:", err);
         }
@@ -96,5 +109,5 @@ export default async function handler(req, res) {
     }
   }
   
-  return res.status(405).json({ error: 'Method not allowed' });
+  return res.status(405).json({ error: `Method ${req.method} not allowed` });
 }

@@ -6,14 +6,14 @@ const app = express();
 const ALLOWED_HOSTS = ['https://cv-sable-seven.vercel.app'];
 
 app.use(cors({
-  origin: ALLOWED_HOSTS,
-  methods: ['GET','POST','OPTIONS'],
-  allowedHeaders: ['Content-Type']
+  origin:  ['https://cv-sable-seven.vercel.app'],
+  methods: 'GET,POST,PUT,DELETE,PATCH',
+  allowedHeaders: "Content-Type,Authorization"
 }));
 app.use(express.json());
 
 // обробка preflight
-app.options("/api/track", (req, res) => res.sendStatus(204));
+app.options("*", cors());
 
 app.post("/api/track", async (req, res) => {
   const { to, label } = req.body; // POST тепер використовує body

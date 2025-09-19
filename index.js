@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
@@ -7,11 +6,17 @@ const app = express();
 const ALLOWED_HOSTS = ['cv-sable-seven.vercel.app'];
 
 app.use(cors({
-  origin: ALLOWED_HOSTS
+  origin: ALLOWED_HOSTS,
+  methods: ['GET','POST','OPTIONS'],
+  allowedHeaders: ['Content-Type']
 }));
+app.use(express.json());
 
-app.get("/api/track", async (req, res) => {
-  const { to, label } = req.query;
+// обробка preflight
+app.options("/api/track", (req, res) => res.sendStatus(204));
+
+app.post("/api/track", async (req, res) => {
+  const { to, label } = req.body; // POST тепер використовує body
   if (!to) return res.status(400).send('Missing "to" parameter');
 
   try {
@@ -54,7 +59,5 @@ app.get("/api/track", async (req, res) => {
   res.writeHead(302, { Location: to });
   res.end();
 });
-
-app.get("/", (req, res) => res.send("CV Tracker Server is running."));
 
 app.listen(3000, () => console.log("Server running on http://localhost:3000"));

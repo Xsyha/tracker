@@ -5,10 +5,7 @@ const cors = require("cors");
 const app = express();
 app.use(cors());
 
-const ALLOWED_HOSTS = (process.env.ALLOWED_HOSTS || '')
-  .split(',')
-  .map(s => s.trim().toLowerCase())
-  .filter(Boolean);
+const ALLOWED_HOSTS = ['https://cv-sable-seven.vercel.app/','https://cv-sable-seven.vercel.app']
 
 app.get("/api/track", async (req, res) => {
   const { to, label } = req.query;

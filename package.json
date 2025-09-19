@@ -1,0 +1,27 @@
+{
+  "name": "tracker",
+  "version": "1.0.0",
+  "description": "Server for tracking CV link clicks and sending Telegram notifications",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "node-fetch": "^2.6.7",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "cv",
+    "telegram",
+    "tracker",
+    "vercel"
+  ],
+  "author": "Oksana Rublenko",
+  "license": "MIT"
+}

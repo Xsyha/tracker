@@ -1,11 +1,14 @@
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', 'https://cv-sable-seven.vercel.app'); // не *
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', 'https://cv-sable-seven.vercel.app'); 
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+  // preflight
   if (req.method === 'OPTIONS') return res.status(204).end();
   if (req.method !== 'POST') return res.status(405).end();
 
+  // parse JSON body
   let body;
   try {
     body = await new Promise((resolve, reject) => {
@@ -21,17 +24,7 @@ export default async function handler(req, res) {
   const { to, label } = body;
   if (!to) return res.status(400).send('Missing "to"');
 
-  // validate host whitelisted
-  const ALLOWED = (process.env.ALLOWED_HOSTS || '').split(',').map(s=>s.trim().toLowerCase());
-  try {
-    const url = new URL(to);
-    const host = url.hostname.replace(/^www\./,'').toLowerCase();
-    if (!ALLOWED.includes(host)) return res.status(403).send('Redirect target not allowed');
-  } catch {
-    return res.status(400).send('Bad "to" URL');
-  }
-
-  // тут твій код для IP, geo, Telegram та редіректу
+  // Тут код для редіректу, Telegram, geo і т.д.
   res.writeHead(302, { Location: to });
   return res.end();
 }

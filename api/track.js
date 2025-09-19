@@ -1,17 +1,18 @@
-// api/index.js
+// api/track.js
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
-const ALLOWED_HOSTS = ['https://cv-sable-seven.vercel.app'];
+const ALLOWED_HOSTS = ['cv-sable-seven.vercel.app'];
 
 export default async function handler(req, res) {
-  // CORS заголовки
+  // Встановлюємо CORS заголовки для всіх запитів
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+  res.setHeader('Access-Control-Max-Age', '86400');
 
-  // Обробка preflight
+  // Обробка preflight запитів
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    return res.status(200).json({ message: 'OK' });
   }
 
   // Тільки POST запити

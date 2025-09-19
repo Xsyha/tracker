@@ -3,47 +3,15 @@ const cors = require("cors");
 
 const app = express();
 
-// CORS конфігурація для Vercel
-const corsOptions = {
-  origin: function (origin, callback) {
-    const allowedOrigins = [
-      'https://cv-sable-seven.vercel.app',
-      'http://localhost:3000',
-      'http://localhost:3001'
-    ];
-    
-    // Дозволяємо запити без origin (наприклад, мобільні додатки або Postman)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  credentials: true,
-  optionsSuccessStatus: 200 // для підтримки legacy браузерів
-};
+// Простий CORS з бібліотекою
+app.use(cors({
+  origin: '*',
+  methods: '*',
+  allowedHeaders: '*'
+}));
 
-app.use(cors(corsOptions));
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Додаткові заголовки для Vercel
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin);
-  res.header('Access-Control-Allow-Credentials', true);
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-  next();
-});
 
 // Імпорт fetch для Node.js
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));

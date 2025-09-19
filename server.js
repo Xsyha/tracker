@@ -3,7 +3,7 @@ const cors = require("cors");
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const app = express();
-const ALLOWED_HOSTS = ['cv-sable-seven.vercel.app'];
+const ALLOWED_HOSTS = ['https://cv-sable-seven.vercel.app'];
 
 app.use(cors({
   origin: ALLOWED_HOSTS,
